@@ -1,0 +1,1 @@
+Program cmd üzerinde mingw32-make komutu ile çalıştırılabilir.

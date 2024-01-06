@@ -1,12 +1,11 @@
 All: compile run
 
 compile:
-	g++ -I ./include -o ./lib/Basamak.o -c ./src/Basamak.cpp
-	g++ -I ./include -o ./lib/Sayi.o -c ./src/Sayi.cpp
-	g++ -I ./include -o ./lib/SayilarListesi.o -c ./src/SayilarListesi.cpp
-	g++ -I ./include -o ./lib/Dugum.o -c ./src/Dugum.cpp
+	g++ -I ./include -o ./lib/Yigit.o -c ./src/Yigit.cpp
+	g++ -I ./include -o ./lib/AvlTreeList.o -c ./src/AvlTreeList.cpp
+	g++ -I ./include -o ./lib/AvlTree.o -c ./src/AvlTree.cpp
 	g++ -I ./include -o ./lib/main.o -c ./src/main.cpp
-	g++ -I ./include/ -o ./bin/main ./lib/Basamak.o ./lib/Sayi.o ./lib/SayilarListesi.o ./lib/Dugum.o ./lib/main.o
+	g++ -I ./include/ -o ./bin/main ./lib/Yigit.o ./lib/AvlTreeList.o ./lib/AvlTree.o ./lib/main.o
 	
 run:
 	cls

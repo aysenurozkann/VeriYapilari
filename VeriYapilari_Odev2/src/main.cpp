@@ -1,10 +1,11 @@
 /** 
 * @file			: main.cpp
-* @description	: Bu program bir dosyadan okudugu tam sayilari bagli listelerde tutar
+* @description	: Program Avl agaclarina veri ekler, en kucuk ve en buyuk 
+				  sayilari kurallara uygun olarak cikarir.
 * @course		: A grubu, 1.ogretim
-* @assignment	: Odev1
-* @date			: 08.11.2023
-* @author		: Aysenur Ozkan aysenur.ozkan6@ogr.sakarya.edu.tr
+* @assignment	: Odev2
+* @date			: 05.12.2023
+* @author		: Aysenur Ozkan, aysenur.ozkan6@ogr.sakarya.edu.tr
 */
 
 #include <iostream>
@@ -13,72 +14,76 @@
 #include <iomanip>
 #include <cstdint>
 
-
-#include "Sayi.hpp"
-#include "Basamak.hpp"
-#include "Dugum.hpp"
-#include "SayilarListesi.hpp"
+#include "AvlTree.hpp"
+#include "AvlTreeList.hpp"
+#include "Yigit.hpp"
 
 using namespace std;
 
-void openFile(ifstream& sayilarDosyasi, SayilarListesi* sayilarListesi) {
+void openFile(ifstream& sayilarDosyasi, AvlTreeList* avlTreeList) {
     string satir;
+    int agacNumarasi = 1;
     while (getline(sayilarDosyasi, satir)) {
         istringstream ss(satir);
+        AvlTree* avlTree = new AvlTree();
         int sayi;
         while (ss >> sayi) {
-            Sayi* yeniSayi = new Sayi();
-            while (sayi > 0) {
-                int basamak = sayi % 10;
-                yeniSayi->ekleBasamak(basamak);
-                sayi /= 10;
-            }
-            sayilarListesi->sayiEkle(yeniSayi);
+            avlTree->kok = avlTree->sayiEkle(avlTree->kok, sayi);
         }
+        avlTreeList->ekle(avlTree, agacNumarasi);
+        agacNumarasi++;
     }
     sayilarDosyasi.close();
 }
 
 int main() {
-    ifstream sayilarDosyasi("sayilar.txt");
-    if (!sayilarDosyasi) {
-        cerr << "Dosya acilamadi." << endl;
+    // txt dosyasindan okunan her bir satirdaki sayilar avlTree'ye eklenir,
+    // her bir satir avlTree olusturur ve avlTree'lerin her biri avlTreeList'e eklenir
+    AvlTreeList* avlTreeList = new AvlTreeList;
+
+    const string dosyaYolu = "Veri.txt";
+    ifstream file(dosyaYolu);
+    
+    if (!file.is_open()) {
+        cerr << "Dosya acilamadi: " << dosyaYolu << endl;
         return 1;
     }
 
-    SayilarListesi* sayilarListesi = new SayilarListesi();
-    openFile(sayilarDosyasi, sayilarListesi);
+    // dosyadan okunan tum sayilar avlTree'lere eklenerek avlTreeList'te tutulur
+    openFile(file, avlTreeList);
 
-    sayilarListesi->ekranaYaz();
-    int secim;
-
-    do {
-        std::cout << "1. Tek basamaklari Basa Al\n";
-        std::cout << "2. Basamaklari Tersle\n";
-        std::cout << "3. En Buyuk Cikar\n";
-        std::cout << "4. Cikis\n";
-        std::cin >> secim;
-
-        switch (secim) {
-            case 1:
-                sayilarListesi->tekleriBasaAl();
-                sayilarListesi->ekranaYaz();
-                break;
-            case 2:
-                sayilarListesi->basamaklariTersle();
-                sayilarListesi->ekranaYaz();
-                break;
-            case 3:
-                sayilarListesi->enBuyuguCikar();
-                sayilarListesi->ekranaYaz();
-                break;
-            case 4:
-                break;
-            default:
-                std::cout << "Geçersiz secim. Tekrar deneyin.\n";
+    do
+    {
+        if(avlTreeList->bas == nullptr) {
+            break;
         }
+        avlTreeList->postOrder();
+        avlTreeList->yigitlariGoruntule();
+        int dugumCikarildiMi;
+        int agacNumarasi;
+        int sonKarakter;
+        do
+        {
+            agacNumarasi = avlTreeList->bas->agacNumarasi;
+            sonKarakter = avlTreeList->bas->avlToplamDugumDegeri;
+            dugumCikarildiMi = avlTreeList->yigitdanMinMaxCikar();
+            if(avlTreeList->bas == nullptr && dugumCikarildiMi == 1) {
+                int agacNumarasiKarakterUzunlugu = to_string(agacNumarasi).length();
+                cout << "==============================" << endl;
+                cout << "|                            |" << endl;
+                cout << "|                            |" << endl;
+                cout << "|     Son Karakter: " << static_cast<char>(sonKarakter % (90-65+1)+65) << "        |" << endl;
+                cout << "|     AVL No      : " << agacNumarasi;
+                for(int i = 21; i < 30 - agacNumarasiKarakterUzunlugu; i++) { cout << " "; }
+                cout << "|" << endl;
+                cout << "|                            |" << endl;
+                cout << "|                            |" << endl;
+                cout << "==============================" << endl;
+            }
 
-    } while (secim != 4);    
+        } while (!dugumCikarildiMi);
+
+    } while (true);
     
     return 0;
 }
